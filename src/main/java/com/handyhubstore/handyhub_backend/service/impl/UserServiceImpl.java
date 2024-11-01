@@ -6,15 +6,22 @@ import com.handyhubstore.handyhub_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService , UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseEntity<List<User>> getAllUsers() {
@@ -24,7 +31,7 @@ public class UserServiceImpl implements UserService {
             usersData = userRepository.findAll();
             response = new ResponseEntity<>(usersData, HttpStatus.OK);
         } catch (Exception e) {
-            response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500
+            response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return response;
     }
@@ -38,18 +45,23 @@ public class UserServiceImpl implements UserService {
                     && !user.getPassword().isEmpty()) && (user.getName() != null &&
                     user.getEmail() != null && user.getPassword() != null)) {
                 if (userRepository.findByEmail(user.getEmail()) == null) {
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));
                     userData = userRepository.save(user);
                     response = new ResponseEntity<>(userData, HttpStatus.OK);
                 } else {
-                    response = new ResponseEntity<>(HttpStatus.FORBIDDEN); // 403
+                    response = new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
             } else {
-                response = new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE); // 406
+                response = new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
         } catch (Exception e) {
-            response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500
+            response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return response;
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
+    }
 }
