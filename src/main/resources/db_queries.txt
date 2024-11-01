@@ -1,0 +1,17 @@
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+INSERT INTO users (name, email, password) VALUES
+    ('Hiran', 'hiran@example.com', 'password@123'),
+    ('Asanka', 'asanka@example.com', 'password#456'),
+    ('Shevoni', 'shevoni@example.com', 'password@789')
+;
+
+select * from users;
+delete from users;
+drop table users;
+truncate table users;
